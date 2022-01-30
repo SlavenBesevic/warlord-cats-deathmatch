@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION public.battle_status_log()
 RETURNS TRIGGER AS $function$
 DECLARE
   numberOfArmies INT;
+  numberOfActiveBattles INT;
 BEGIN
   If NEW."status" = 'In progress' THEN
     SELECT
@@ -24,6 +25,19 @@ BEGIN
 
     IF numberOfArmies < 3 THEN
       RAISE 'cannot start battle with less than 3 armies' USING ERRCODE = '23001';
+    END IF;
+
+    SELECT
+      COUNT(*)
+    INTO
+      numberOfActiveBattles
+    FROM
+      battles
+    WHERE
+      "status" = 'In progress';
+
+    IF numberOfActiveBattles >= 5 THEN
+      RAISE '5 battles are in progress, try again in a few seconds' USING ERRCODE = '23001';
     END IF;
 
     INSERT INTO battle_logs (
