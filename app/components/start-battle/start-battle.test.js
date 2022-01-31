@@ -35,7 +35,7 @@ describe('Start battle', () => {
 
     should.exist(dbBattle.battleId);
     dbBattle.name.should.equal(createdBattle.name);
-    dbBattle.status.should.equal('Pending');
+    dbBattle.status.should.equal('In progress');
     should.exist(dbBattle.createdAt);
     should.exist(dbBattle.updatedAt);
   });

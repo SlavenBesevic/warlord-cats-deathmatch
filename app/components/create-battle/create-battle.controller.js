@@ -17,5 +17,6 @@ module.exports.createBattle = async (req, res) => {
 
   return res.status(200).send({
     message: 'Successfully created battle',
+    results: { battleId },
   });
 };

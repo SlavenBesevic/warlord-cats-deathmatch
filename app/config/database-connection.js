@@ -1,10 +1,18 @@
-const { Pool } = require('pg');
+const { Client, Pool } = require('pg');
 const { PG_CONNECTION_STRING } = require('./environments');
 const { HTTPError, errorConstants } = require('../middlewares/errors/http-errors');
 
 const pool = new Pool({
   connectionString: PG_CONNECTION_STRING,
 });
+
+const client = new Client({
+  connectionString: PG_CONNECTION_STRING,
+});
+client.connect();
+client.query('LISTEN fill_empty_slot');
+
+module.exports.client = client;
 
 module.exports.pgPool = (query) => pool.query(query)
   .then((res) => res.rows)

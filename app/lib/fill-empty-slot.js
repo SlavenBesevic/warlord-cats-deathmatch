@@ -1,15 +1,14 @@
-const { randomIntBetween } = require('./misc');
-const { addArmy, addBattle } = require('../helpers');
+const { addManyArmies, addBattle } = require('../helpers');
 const { initializeBattle } = require('./initialize-battle');
 
 const fillEmptySlot = async () => {
   const [battle] = await addBattle();
 
-  await Promise.all(
-    new Array(randomIntBetween(3, 300)).fill().map(() => addArmy({ battleId: battle.battleId })),
-  );
+  const armies = await addManyArmies({ battleId: battle.battleId });
 
-  initializeBattle(battle.battleId);
+  battle.armies = armies;
+
+  initializeBattle(battle);
 };
 
 module.exports = {

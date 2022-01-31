@@ -1,37 +1,32 @@
 const { pgPool, sql } = require('../config/database-connection');
-const { HTTPError, errorConstants } = require('../middlewares/errors/http-errors');
 const { Army, Battle } = require('../models');
+const { errorLogger } = require('../middlewares/errors/error-logger');
 
-module.exports.initializeBattle = async (battleId) => {
-  const [[battle], armies] = await Promise.all([
-    pgPool(sql`
+module.exports.initializeBattle = async (battle) => {
+  try {
+    const dbBattle = await pgPool(sql`
       UPDATE
         battles
       SET
         "status" = 'In progress'
       WHERE
-        "battleId" = ${battleId}
+        "battleId" = ${battle.battleId}
       RETURNING
-        "battleId";`),
-    pgPool(sql`
-      SELECT
-        *
-      FROM
-        armies
-      WHERE
-        "battleId" = ${battleId};`),
-  ]);
+        "battleId"`);
 
-  if (!battle) throw new HTTPError(errorConstants.NOT_FOUND);
+    if (dbBattle) {
+      const initArmies = battle.armies.map((army) => new Army(
+        army.armyId,
+        battle.battleId,
+        army.name,
+        army.units,
+        army.strategy,
+      ));
 
-  const initArmies = armies.map((army) => new Army(
-    army.armyId,
-    battle.battleId,
-    army.name,
-    army.units,
-    army.strategy,
-  ));
-
-  const initBattle = new Battle(battle.battleId, initArmies);
-  initBattle.startBattle();
+      const initBattle = new Battle(battle.battleId, initArmies);
+      initBattle.startBattle();
+    }
+  } catch (err) {
+    errorLogger(err);
+  }
 };

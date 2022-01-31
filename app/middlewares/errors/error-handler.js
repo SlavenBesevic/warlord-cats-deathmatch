@@ -1,4 +1,4 @@
-const bunyan = require('bunyan');
+const { errorLogger } = require('./error-logger');
 
 /**
  * Error handling middleware
@@ -12,11 +12,7 @@ module.exports = () => (err, req, res, next) => {
       errorCode: 0,
       message: 'Oops, an error occurred',
     };
-
-    bunyan.createLogger({
-      name: err.name,
-      streams: [{ level: 'error', path: 'error.log' }],
-    }).error(err);
+    errorLogger(err);
   }
 
   return res.status(err.status).send(err.response);

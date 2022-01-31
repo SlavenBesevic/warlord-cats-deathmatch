@@ -14,13 +14,14 @@ describe('Create battle', () => {
     const body = {
       name: faker.name.firstName(),
     };
-    const { body: { message } } = await request(app)
+    const { body: { message, results } } = await request(app)
       .post('/api/v1/battles')
       .set('Accept', 'application/json')
       .send(body)
       .expect(200);
 
     message.should.equal('Successfully created battle');
+    should.exist(results.battleId);
 
     const [dbBattle] = await pgPool(sql`
       SELECT *

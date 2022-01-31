@@ -5,6 +5,22 @@ const lusca = require('lusca');
 const { PORT } = require('./app/config/environments');
 const ErrorHandler = require('./app/middlewares/errors/error-handler');
 const AppRoutes = require('./app/router');
+const { client } = require('./app/config/database-connection');
+const { fillEmptySlot } = require('./app/lib/fill-empty-slot');
+const { findActiveBattles } = require('./app/lib/restore-battles');
+const { initializeBattle } = require('./app/lib/initialize-battle');
+
+client
+  .query(findActiveBattles)
+  .then(({ rows }) => {
+    if (rows.length) {
+      rows.map((row) => initializeBattle(row));
+    } else {
+      fillEmptySlot();
+    }
+  });
+
+client.on('notification', () => fillEmptySlot());
 
 const app = express();
 

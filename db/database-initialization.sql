@@ -11,4 +11,3 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 \i :v2/db/tables/armies.sql;
 \i :v2/db/tables/battle-logs.sql;
 \i :v2/db/functions/set-timestamp-trigger.sql;
-\i :v2/db/fake-data.sql;

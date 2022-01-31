@@ -1,5 +1,5 @@
 CREATE TABLE public.battle_logs (
-  "logId" BIGSERIAL,
+  "logId"  UUID NOT NULL DEFAULT uuid_generate_v4(),
   "battleId" UUID NOT NULL,
   "event" battle_events NOT NULL,
   "details" JSONB,

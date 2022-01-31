@@ -62,3 +62,31 @@ CREATE TRIGGER "battle_status_log"
 BEFORE INSERT OR UPDATE ON public.battles
 FOR EACH ROW
 EXECUTE PROCEDURE public.battle_status_log();
+
+
+CREATE OR REPLACE FUNCTION public.notify_fill_empty_slot()
+RETURNS TRIGGER AS $function$
+DECLARE
+  numberOfActiveBattles INT;
+BEGIN
+  SELECT
+    COUNT(*)
+  INTO
+    numberOfActiveBattles
+  FROM
+    battles
+  WHERE
+    "status" = 'In progress';
+
+  IF numberOfActiveBattles < 2 THEN
+    NOTIFY fill_empty_slot;
+  END IF;
+
+  RETURN NEW;
+END $function$
+LANGUAGE 'plpgsql';
+
+CREATE TRIGGER "notify_fill_empty_slot"
+AFTER UPDATE ON public.battles
+FOR EACH ROW
+EXECUTE PROCEDURE public.notify_fill_empty_slot();

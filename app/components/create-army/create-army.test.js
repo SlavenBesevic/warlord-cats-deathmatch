@@ -22,17 +22,19 @@ describe('Create army', () => {
       units: faker.datatype.number({ min: 80, max: 100 }),
       strategy: sample(armyStrategy),
     };
-    const { body: { message } } = await request(app)
+    const { body: { message, results } } = await request(app)
       .post(`/api/v1/battles/${createdBattle.battleId}/armies`)
       .set('Accept', 'application/json')
       .send(body)
       .expect(200);
 
     message.should.equal('Successfully created army');
+    should.exist(results.armyId);
 
     const [dbArmy] = await pgPool(sql`
       SELECT *
-      FROM armies;`);
+      FROM armies
+      WHERE "armyId" = ${results.armyId};`);
 
     should.exist(dbArmy.armyId);
     dbArmy.battleId.should.equal(createdBattle.battleId);

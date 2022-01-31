@@ -18,11 +18,10 @@ module.exports.createArmy = async (req, res) => {
       ${battleId},
       ${name},
       ${units},
-      ${strategy}
-    )
-    RETURNING *;`);
+      ${strategy});`);
 
   return res.status(200).send({
     message: 'Successfully created army',
+    results: { armyId },
   });
 };

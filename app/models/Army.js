@@ -146,8 +146,6 @@ class Army {
     };
 
     this.createLog('Winner', logDetails);
-
-    return this.name;
   }
 
   createLog(event, details) {
